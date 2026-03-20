@@ -27,7 +27,7 @@ r_update = r;
 
 %% Iteration
 for i = 1:max_iters
-    d = K' * r;
+    d = K' * r_update;
     w = K * d;
     tau = norm(d)^2 / norm(w)^2;
     x_update = x_update + tau * d;
