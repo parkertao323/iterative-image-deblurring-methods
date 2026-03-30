@@ -54,43 +54,43 @@ It achieves strong early restoration quality very quickly. However, the results 
 
 ## Metrics Tracked
 
-The Python implementations extend the original MATLAB work by tracking and exporting quantitative metrics throughout the iteration process.
+The Python implementations extend the original MATLAB code by tracking and exporting quantitative metrics throughout the iteration process.
 
 ### Common metrics
 - **Residual norm**
-- **PSNR (Peak Signal-to-Noise Ratio)**
-- **SSIM (Structural Similarity Index)**
+- **Peak Signal-to-Noise Ratio(PSNR)**
+- **Structural Similarity Index(SSIM)**
 - **Runtime**
-- **Noise mean / noise standard deviation**
+- **Noise mean / standard deviation**
 - **Relative noise percentage**
 - **Observation SNR**
 
-### Method-specific metrics
+### Method-unique metrics
 - **Steepest Descent:** adaptive step size `tau`
-- **Conjugate Gradient:** `beta`, `gamma`, relative reconstruction error
+- **Conjugate Gradient:** `beta`, `gamma`, and relative restoration error
 
-These metrics make it possible to compare methods not only by visual output, but also by measurable performance trends.
+These metrics make it possible to compare methods not only by visual output, but also by measurable quantitative trends.
 
 ---
 
 ## Main Findings from the Current Experiment
 
-The current outputs suggest the following interpretation:
+The current outputs suggest the following interpretation. One may expect the following outcomes:
 
-- **SOR** provides a reasonable baseline, but it is comparatively slow.
-- **Steepest Descent** is the most balanced improvement over the baseline:
-  - it reaches strong PSNR much sooner than SOR
+- **SOR** provides a reasonable starting point, but it is relatively slow and can be inefficient.
+- **Steepest Descent** is the most balanced improvement over SOR as:
+  - it reaches strong PSNR much sooner
   - it keeps competitive image quality
-  - it is easier to justify as a practical upgrade
+  - it is more qualified as a practical upgrade
 - **Conjugate Gradient** improves fastest in the early stage, but it is also the most sensitive to over-iteration:
   - it reaches near-peak image quality in very few iterations
   - however, late iterations may degrade reconstruction quality, so stopping criteria matter
 
 ### Example takeaways from the current data
-- Steepest Descent reaches **PSNR = 25** in about **half the iterations** needed by SOR.
-- Conjugate Gradient reaches high-quality reconstructions the fastest, but the full iteration history shows that **smaller residuals do not always mean better perceptual image quality**.
-- This project highlights an important lesson in inverse problems:  
-  **the fastest numerical method is not automatically the best practical reconstruction method unless stopping rules are chosen carefully.**
+- Steepest Descent reaches **PSNR = 25** in about **half the iterations** SOR needs.
+- Conjugate Gradient reaches high-quality restorations the fastest, but the full iteration history shows that **smaller residuals do not always mean better perceptual image quality**.
+- This project highlights an important thing in inverse problems:  
+  **The fastest numerical method is not automatically the best practical method unless stopping rules are carefully chosen.**
 
 ---
 
@@ -100,7 +100,6 @@ The current outputs suggest the following interpretation:
 iterative-image-deblurring-methods/
 │
 ├── Code/
-│   ├── Cimmino_Diagonal_Algorithm.m
 │   ├── SOR_Method.m
 │   ├── Steepest_Descent_Method.m
 │   ├── Conjugate_Gradient_Method.m
