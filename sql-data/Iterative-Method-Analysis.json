@@ -1,0 +1,34 @@
+{
+    "version": 3,
+    "inquiries": [
+        {
+            "id": "Gw2XtdXQV-6oqR5KXz_0g",
+            "query": "/*\n0.Transform the CSV file to one that can be processed by SQL editor\nDROP VIEW IF EXISTS clean_metrics;\n\nCREATE VIEW clean_metrics AS\nWITH base AS (\n    SELECT\n        rowid AS rid,\n        NULLIF(TRIM(Algorithm), '') AS Algorithm,\n        CAST(Iteration AS INTEGER) AS Iteration,\n        CAST(Residual AS REAL) AS Residual,\n        CAST(PSNR AS REAL) AS PSNR,\n        CAST(SSIM AS REAL) AS SSIM\n    FROM Iterative_Algorithm_outputs\n    WHERE Iteration IS NOT NULL\n),\nfilled AS (\n    SELECT\n        b1.rid,\n        (\n            SELECT b2.Algorithm\n            FROM base b2\n            WHERE b2.rid <= b1.rid\n              AND b2.Algorithm IS NOT NULL\n            ORDER BY b2.rid DESC\n            LIMIT 1\n        ) AS Algorithm,\n        b1.Iteration,\n        b1.Residual,\n        b1.PSNR,\n        b1.SSIM\n    FROM base b1\n)\nSELECT\n    Algorithm,\n    Iteration,\n    Residual,\n    PSNR,\n    SSIM\nFROM filled\nWHERE Algorithm IS NOT NULL;\n\nSELECT Algorithm, COUNT(*) AS n_rows\nFROM clean_metrics\nGROUP BY Algorithm;\n*/\n\n/*\n1.Find the maximum Pixel Signal-to-Noise Ratio(PSNR) of each algorithm\nSELECT Algorithm, Iteration, PSNR\nFROM (\n    SELECT\n        Algorithm,\n        Iteration,\n        PSNR,\n        ROW_NUMBER() OVER (PARTITION BY Algorithm ORDER BY PSNR DESC) AS row_num\n    FROM clean_metrics\n)\nWHERE row_num = 1;\n*/\n\n/*\n2.Find the maximum Structural Similarity Index Measure(SSIM) of each algorithm\nSELECT Algorithm, Iteration, SSIM\nFROM (\n    SELECT\n        Algorithm,\n        Iteration,\n        SSIM,\n        ROW_NUMBER() OVER (PARTITION BY Algorithm ORDER BY SSIM DESC) AS row_num\n    FROM clean_metrics\n)\nWHERE row_num = 1;\n*/\n\n/*\n3.First iteration where PSNR reaches a set value, 25 in this case\nSELECT Algorithm, MIN(Iteration) AS First_Iter_PSNR_Greater_25\nFROM clean_metrics\nWHERE PSNR >= 25\nGROUP BY Algorithm;\n*/\n\n/*\n4.First iteration where residual becomes small enough,take 2 in this case\nSELECT Algorithm, MIN(Iteration) AS First_Iter_Residual_Small_2\nFROM clean_metrics\nWHERE Residual <= 2\nGROUP BY Algorithm;\n*/\n\n/*\n5.Compare the best PSNR with the last PSNR in each algorithm\nWITH ranked AS (\n    SELECT\n        Algorithm,\n        Iteration,\n        PSNR,\n        MAX(Iteration) OVER (PARTITION BY Algorithm) AS Last_Iter\n    FROM clean_metrics\n)\nSELECT\n    Algorithm,\n    MAX(PSNR) AS Best_PSNR,\n    MAX(CASE WHEN Iteration = Last_Iter THEN PSNR END) AS LAST_PSNR\nFROM ranked\nGROUP BY Algorithm;\n*/\n\n/*\n6.Compare the best SSIM with the last SSIM in each algorithm\nWITH ranked AS (\n    SELECT\n        Algorithm,\n        Iteration,\n        SSIM,\n        MAX(Iteration) OVER (PARTITION BY Algorithm) AS Last_Iter\n    FROM clean_metrics\n)\nSELECT\n    Algorithm,\n    MAX(SSIM) AS Best_SSIM,\n    MAX(CASE WHEN Iteration = Last_Iter THEN SSIM END) AS LAST_SSIM\nFROM ranked\nGROUP BY Algorithm;\n*/\n\n/*\n7.Locate the iteration where each algorithm meets its best PSNR, and present the corresponding residual and SSIM\nSELECT Algorithm, Iteration, PSNR, Residual, SSIM\nFROM (\n    SELECT\n        Algorithm,\n        Iteration,\n        PSNR,\n        Residual,\n        SSIM,\n        ROW_NUMBER() OVER (PARTITION BY Algorithm ORDER BY PSNR DESC) AS row_num\n    FROM clean_metrics\n)\nWHERE row_num = 1;\n*/\n\n/*\n8.Similarly, locate the iteration where each algorithm meets its best SSIM, and present the corresponding residual and PSNR\nSELECT Algorithm, Iteration, SSIM, Residual, PSNR\nFROM (\n    SELECT\n        Algorithm,\n        Iteration,\n        SSIM,\n        Residual,\n        PSNR,\n        ROW_NUMBER() OVER (PARTITION BY Algorithm ORDER BY SSIM DESC) AS row_num\n    FROM clean_metrics\n)\nWHERE row_num = 1;\n*/",
+            "viewType": "chart",
+            "viewOptions": {
+                "data": [],
+                "layout": {
+                    "autosize": true,
+                    "xaxis": {
+                        "range": [
+                            -1,
+                            6
+                        ],
+                        "autorange": true
+                    },
+                    "yaxis": {
+                        "range": [
+                            -1,
+                            4
+                        ],
+                        "autorange": true
+                    }
+                },
+                "frames": []
+            },
+            "name": "Iterative-Method-Analysis",
+            "updatedAt": "2026-03-29T22:14:34.436Z",
+            "createdAt": "2026-03-29T22:14:34.436Z"
+        }
+    ]
+}
