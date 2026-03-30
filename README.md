@@ -72,7 +72,7 @@ These metrics make it possible to compare methods not only by visual output, but
 
 ---
 
-## Main Findings from the Current Experiment
+## Main Findings
 
 The current outputs suggest the following interpretation. One may expect the following outcomes:
 
