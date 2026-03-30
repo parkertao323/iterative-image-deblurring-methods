@@ -30,7 +30,6 @@ Not suprisingly, since the restoration task is challenging due to its **ill-cond
 - numerical stability
 - sensitivity to noise
 - stopping behavior
-- 
 ---
 
 ## Methods Involved
